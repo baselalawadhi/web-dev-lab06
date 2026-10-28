@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Fetcher</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #fdf6e3; 
+            display: flex; 
+            justify-content: center; 
+            padding-top: 50px; 
+        }
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            width: 350px; 
+            text-align: center; 
+        }
+        select { 
+            width: 100%; 
+            padding: 10px; 
+            margin: 15px 0; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 8px; 
+            outline: none; 
+            font-size: 16px; 
+            cursor: pointer;
+        }
+        select:focus { border-color: #a3be8c; }
+        #bookDetails { 
+            margin-top: 20px; 
+            text-align: left; 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 10px; 
+            display: none; 
+        }
+        h3 { color: #5e81ac; margin-top: 0; margin-bottom: 10px; }
+        p { margin: 5px 0; color: #333; }
+        .label { font-weight: bold; color: #88c0d0; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Library Search</h2>
+        <select id="bookSelect">
+            <option value="" disabled selected>Select a book...</option>
+        </select>
+        
+        <div id="bookDetails">
+            <h3 id="displayTitle"></h3>
+            <p><span class="label">Author:</span> <span id="displayAuthor"></span></p>
+            <p><span class="label">Year:</span> <span id="displayYear"></span></p>
+            <p><span class="label">Genres:</span> <span id="displayGenres"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // The link I got from github
+        const jsonUrl = 'https://raw.githubusercontent.com/baselalawadhi/web-dev-lab06/refs/heads/main/books.json';
+        let booksData = [];
+
+        // Fetch the JSON from GitHub
+        async function loadBooks() {
+            try {
+                const response = await fetch(jsonUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                booksData = data.Books;
+
+                const select = document.getElementById('bookSelect');
+                
+                // Populate the dropdown with book titles
+                booksData.forEach(book => {
+                    const option = document.createElement('option');
+                    option.value = book.title;
+                    option.textContent = book.title;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error fetching book data:", error);
+                alert("Failed to load data. Check your GitHub Raw URL!");
+            }
+        }
+
+        // Display the selected book
+        document.getElementById('bookSelect').addEventListener('change', function() {
+            const selectedTitle = this.value;
+            const book = booksData.find(b => b.title === selectedTitle);
+            
+            if (book) {
+                document.getElementById('displayTitle').textContent = book.title;
+                document.getElementById('displayAuthor').textContent = book.author;
+                document.getElementById('displayYear').textContent = book.publicationYear;
+                document.getElementById('displayGenres').textContent = book.genres.join(', ');
+                
+                document.getElementById('bookDetails').style.display = 'block';
+            }
+        });
+
+        // Initialize the fetch when the page loads
+        loadBooks();
+    </script>
+</body>
+</html>
